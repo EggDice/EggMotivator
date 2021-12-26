@@ -1,6 +1,9 @@
 import {
   setNotificationHandler,
   scheduleNotificationAsync,
+  cancelScheduledNotificationAsync,
+  cancelAllScheduledNotificationsAsync,
+  getAllScheduledNotificationsAsync,
 } from 'expo-notifications';
 
 import { main } from './main';
@@ -8,6 +11,9 @@ import { main } from './main';
 const ExternalNotifications = {
   setNotificationHandler,
   scheduleNotificationAsync,
+  cancelScheduledNotificationAsync,
+  cancelAllScheduledNotificationsAsync,
+  getAllScheduledNotificationsAsync,
 };
 
 export default main({

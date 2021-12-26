@@ -7,4 +7,5 @@ export interface IntervalNotificationSchedule {
 export interface NotificationService {
   setIntervalNotification(schedule: IntervalNotificationSchedule):
     Promise<string>;
+  clearIntervalNotification(id: string): Promise<void>;
 };

@@ -24,8 +24,15 @@ export const notificationAdapter =
       },
       trigger: {
         seconds: interval / 1000,
+        repeats: true,
       },
     });
 
-  return { setIntervalNotification };
+  const clearIntervalNotification = (id: string): Promise<void> =>
+    expoNotifications.cancelScheduledNotificationAsync(id);
+
+  return {
+    setIntervalNotification,
+    clearIntervalNotification,
+  };
 };

@@ -11,6 +11,7 @@ export const getRoot = ({notification}: {notification: NotificationService}): Fu
         title: 'Focus',
         body: 'I mean really',
         interval: 10000,
+
       });
     }}>Hello Open up App.tsx to start working on your app!</Text>
     <StatusBar style="auto" />
