@@ -53,13 +53,83 @@ test('Stop notification interval', async () => {
     body: 'this is it',
     interval: 10000,
   });
-
   await notificationService.clearIntervalNotification(id);
 
   expect(await mockExpoNotifications.getAllScheduledNotificationsAsync())
     .toEqual([]);
 });
 
+test('List scheduled interval notifications', async () => {
+  const {
+    mockExpoNotifications,
+    notificationService,
+  } = createNotificationService();
+
+  await mockExpoNotifications.scheduleNotificationAsync({
+    content: {
+      title: 'hello',
+      body: 'this is it',
+    },
+    trigger: {
+      seconds: 10,
+      repeats: true,
+    },
+  });
+  await mockExpoNotifications.scheduleNotificationAsync({
+    content: {
+      title: 'hello 2',
+      body: 'this is it',
+    },
+    trigger: {
+      seconds: 5,
+      repeats: true,
+    },
+  });
+
+  expect(await notificationService.getIntervalNotifications())
+    .toEqual([{
+        title: 'hello',
+        body: 'this is it',
+        interval: 10000,
+        id: '0',
+      }, {
+        title: 'hello 2',
+        body: 'this is it',
+        interval: 5000,
+        id: '1',
+    }]);
+});
+
+test('Clear all interval notiications', async () => {
+  const {
+    mockExpoNotifications,
+    notificationService,
+  } = createNotificationService();
+
+  await mockExpoNotifications.scheduleNotificationAsync({
+    content: {
+      title: 'hello',
+      body: 'this is it',
+    },
+    trigger: {
+      seconds: 10,
+      repeats: true,
+    },
+  });
+  await mockExpoNotifications.scheduleNotificationAsync({
+    content: {
+      title: 'hello 2',
+      body: 'this is it',
+    },
+    trigger: {
+      seconds: 5,
+      repeats: true,
+    },
+  });
+  await notificationService.clearAllIntervalNotification();
+  expect(await mockExpoNotifications.getAllScheduledNotificationsAsync())
+    .toEqual([]);
+});
 
 const createNotificationService = () => {
   const mockExpoNotifications = fakeExpoNotifications();
