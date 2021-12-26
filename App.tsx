@@ -5,13 +5,13 @@ import {
 
 import { main } from './main';
 
-const Notifications = {
+const ExternalNotifications = {
   setNotificationHandler,
   scheduleNotificationAsync,
 };
 
 export default main({
-  services: { Notifications },
+  services: { ExternalNotifications },
   run: ({ Root }) => {
     return Root;
   },

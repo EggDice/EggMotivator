@@ -1,26 +1,24 @@
 import type {
-  NotificationHandler,
-  NotificationRequestInput
-} from 'expo-notifications';
+  ExpoNotifications
+} from './notification/notifications-expo-external';
 import type { FunctionComponent } from 'react';
+import type { NotificationService } from './notification/notification';
 
 import { application } from './core/application';
 import { getRoot } from './core/Root';
+import { notificationAdapter } from './notification/notification-adapter';
 
-type ExpoNotifications = {
-  setNotificationHandler:
-    (handler: NotificationHandler) => void,
-  scheduleNotificationAsync:
-    (request: NotificationRequestInput) => Promise<string>,
+type InternalServices = {
+  Root: FunctionComponent,
+  notification: NotificationService
 };
-type InternalServices = { Root: FunctionComponent };
-type ExternalServices = { Notifications: ExpoNotifications };
+type ExternalServices = { ExternalNotifications: ExpoNotifications };
 
 export const main = ({
   run,
   services,
 }: {
-  run: ({ Root }: { Root: InternalServices["Root"] }) => FunctionComponent,
+  run: (services: InternalServices) => FunctionComponent,
   services: ExternalServices,
 }) => application<
   ExternalServices,
@@ -28,15 +26,9 @@ export const main = ({
 >({
   externalServices: services,
   run,
-  configure: ({ Notifications }) => {
-   Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowAlert: true,
-      shouldPlaySound: false,
-      shouldSetBadge: false,
-    }),
-  });
-    const Root = getRoot({Notifications});
-    return { Root };
+  configure: ({ ExternalNotifications }) => {
+    const notification = notificationAdapter(ExternalNotifications);
+    const Root = getRoot({notification});
+    return { Root, notification };
   }
 });
