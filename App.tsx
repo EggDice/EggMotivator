@@ -6,7 +6,7 @@ import {
   getAllScheduledNotificationsAsync,
 } from 'expo-notifications';
 
-import { main } from './main';
+import { main } from './app/main';
 
 const ExternalNotifications = {
   setNotificationHandler,

@@ -1,12 +1,12 @@
 import type {
   ExpoNotifications
-} from './notification/notifications-expo-external';
+} from '@notification/notifications-expo-external';
 import type { FunctionComponent } from 'react';
-import type { NotificationService } from './notification/notification';
+import type { NotificationService } from '@notification/notification';
 
-import { application } from './core/application';
-import { getRoot } from './core/Root';
-import { notificationAdapter } from './notification/notification-adapter';
+import { application } from '@core/application';
+import { getRoot } from './Root';
+import { notificationAdapter } from '@notification/notification-adapter';
 
 type InternalServices = {
   Root: FunctionComponent,
