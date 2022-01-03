@@ -3,12 +3,12 @@ import type { PayloadStoreEvent } from '@core/store';
 
 export interface ScheduleState {
   scheduleStatus: 'initial' | 'off' | 'on';
-  timeout: number,
+  interval: number,
 };
 
 export interface SchedulePayloadOn {
   scheduleStatus: 'on';
-  timeout: number;
+  interval: number;
 };
 
 export interface SchedulePayloadOff {
@@ -33,7 +33,7 @@ export type ScheduleEvent = PayloadStoreEvent
 
 const initialState: ScheduleState = {
   scheduleStatus: 'initial',
-  timeout: 0,
+  interval: 0,
 };
 
 export const scheduleSlice = () => createCoreStoreSlice({

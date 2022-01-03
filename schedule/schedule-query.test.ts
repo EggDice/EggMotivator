@@ -1,6 +1,5 @@
 import { marbles } from 'rxjs-marbles/jest';
 import { scheduleQuery } from './schedule-query';
-import { appStore } from '@app/app-store';
 import type { AppStore } from '@app/app-store';
 
 test('isLoaded$ should be false if initial', marbles((m) => {

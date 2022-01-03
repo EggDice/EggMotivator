@@ -11,7 +11,7 @@ test('Default state is loading', marbles((m) => {
   m.expect(store.state$).toBeObservable(m.cold('L', {'L': {
     schedule: {
       scheduleStatus: 'initial',
-      timeout: 0,
+      interval: 0,
     },
   }}));
 }));
@@ -20,14 +20,14 @@ test('Set schedule to off', () => {
   const { reducer, eventCreators: { setSchedule } } = scheduleSlice();
   const initialState: ScheduleState = {
     scheduleStatus: 'initial',
-    timeout: 0,
+    interval: 0,
   };
   const state = reducer(initialState, setSchedule({
     scheduleStatus: 'off',
   }));
   expect(state).toEqual({
     scheduleStatus: 'off',
-    timeout: 0,
+    interval: 0,
   });
 });
 
@@ -35,14 +35,14 @@ test('Set schedule to on', () => {
   const { reducer, eventCreators: { setSchedule } } = scheduleSlice();
   const initialState: ScheduleState = {
     scheduleStatus: 'initial',
-    timeout: 0,
+    interval: 0,
   };
   const state = reducer(initialState, setSchedule({
     scheduleStatus: 'on',
-    timeout: 5000,
+    interval: 5000,
   }));
   expect(state).toEqual({
     scheduleStatus: 'on',
-    timeout: 5000,
+    interval: 5000,
   });
 });
