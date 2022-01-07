@@ -43,7 +43,7 @@ test('store has inital state', marbles(m => {
       return event.type === 'count/increment' ? state + 1 : state;
     }
   });
-  m.expect(coreStore.state$).toBeObservable(m.cold('0', {'0': { count: 0 }}));
+  m.expect(coreStore.state$).toBeObservable('0', {'0': { count: 0 }});
 }));
 
 test('store has incremented state', marbles(m => {
@@ -55,7 +55,7 @@ test('store has incremented state', marbles(m => {
   });
   coreStore.send({type: 'count/increment'});
   coreStore.send({type: 'count/incrementAmount', payload: 5});
-  m.expect(coreStore.state$).toBeObservable(m.cold('1', {'1': { count: 1 }}));
+  m.expect(coreStore.state$).toBeObservable('1', {'1': { count: 1 }});
 }));
 
 test('create store slice', () => {
@@ -102,10 +102,10 @@ test('create combined store', marbles(m => {
 
   coreStore.send(countSlice.eventCreators.increment());
   coreStore.send(appendSlice.eventCreators.appendA());
-  m.expect(coreStore.state$).toBeObservable(m.cold('1', {'1': {
+  m.expect(coreStore.state$).toBeObservable('1', {'1': {
     count: 1,
     append: 'A',
-  }}));
+  }});
 }));
 
 test('extending store with effects', marbles((m) => {
@@ -126,5 +126,5 @@ test('extending store with effects', marbles((m) => {
     mapTo({type: 'count/incrementAmount', payload: 2})
   ));
   coreStore.send({type: 'count/increment'});
-  m.expect(coreStore.state$).toBeObservable(m.cold('3', {'3': { count: 3 }}));
+  m.expect(coreStore.state$).toBeObservable('3', {'3': { count: 3 }});
 }));

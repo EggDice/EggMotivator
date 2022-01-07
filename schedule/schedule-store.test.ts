@@ -8,12 +8,12 @@ import type {
 test('Default state is loading', marbles((m) => {
   const slice = scheduleSlice();
   const store = createCoreStore({schedule: slice.reducer});
-  m.expect(store.state$).toBeObservable(m.cold('L', {'L': {
+  m.expect(store.state$).toBeObservable('L', {'L': {
     schedule: {
       scheduleStatus: 'initial',
       interval: 0,
     },
-  }}));
+  }});
 }));
 
 test('Set schedule to off', () => {

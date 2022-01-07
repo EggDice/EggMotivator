@@ -7,7 +7,7 @@ test('isLoaded$ should be false if initial', marbles((m) => {
     state$:
       m.cold('iyn', STATE_VALUES),
   } as unknown as AppStore);
-  m.expect(isLoaded$).toBeObservable(m.cold('ftt', BOOLEAN_VALUES));
+  m.expect(isLoaded$).toBeObservable('ftt', BOOLEAN_VALUES);
 }));
 
 test('isOn$ should be true on on', marbles((m) => {
@@ -15,7 +15,7 @@ test('isOn$ should be true on on', marbles((m) => {
     state$:
       m.cold('iyn', STATE_VALUES),
   } as unknown as AppStore);
-  m.expect(isOn$).toBeObservable(m.cold('ftf', BOOLEAN_VALUES));
+  m.expect(isOn$).toBeObservable('ftf', BOOLEAN_VALUES);
 }));
 
 const scheduleStatus = (value: string) => ({
