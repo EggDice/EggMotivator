@@ -1,4 +1,5 @@
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
+import { mergeAll } from 'rxjs/operators';
 import { configureStore, createSlice } from '@reduxjs/toolkit';
 import type { SliceCaseReducers} from '@reduxjs/toolkit';
 import { createStore } from 'redux';
@@ -6,6 +7,7 @@ import { createStore } from 'redux';
 export interface CoreStore<ALL_STATE, ALL_EVENT> {
   state$: Observable<ALL_STATE>;
   send(event: ALL_EVENT): void;
+  registerEffect(effect: CoreEffect<ALL_EVENT>): void;
 }
 
 export type CoreReducer<STATE, EVENT extends StoreEvent = StoreEvent> = (
@@ -74,11 +76,18 @@ export interface CoreStoreSlice<
   eventCreators: StoreEventCreators<STATE, CASE_REDUCERS>;
 };
 
+export type CoreEffect<EVENT> =
+  (event$: Observable<EVENT>) => Observable<EVENT>;
+
 export const createCoreStore = <
   STATE,
   EVENT extends StoreEvent
 > (reducer: CoreReducersObject<STATE, EVENT>): CoreStore<STATE, EVENT> => {
   const store = configureStore({ reducer });
+  const event$ = new Subject<EVENT>();
+  const streams$ = new Subject<Observable<EVENT>>();
+  streams$.pipe(mergeAll()).subscribe((event) => store.dispatch(event));
+  streams$.next(event$);
   return {
     state$: new Observable(subscriber => {
       subscriber.next(store.getState());
@@ -87,7 +96,10 @@ export const createCoreStore = <
       });
     }),
     send: (action) => {
-      store.dispatch(action);
+      event$.next(action);
+    },
+    registerEffect: (effect) => {
+      streams$.next(effect(event$));
     }
   };
 };

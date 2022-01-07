@@ -1,4 +1,6 @@
-import { Observable } from 'rxjs';
+import { of } from 'rxjs';
+import { mapTo } from 'rxjs/operators';
+import type { Observable } from 'rxjs';
 import { marbles, fakeSchedulers } from "rxjs-marbles/jest";
 import { createCoreStore, createCoreStoreSlice } from './store';
 import type { CoreReducer } from './store';
@@ -104,5 +106,25 @@ test('create combined store', marbles(m => {
     count: 1,
     append: 'A',
   }}));
+}));
 
+test('extending store with effects', marbles((m) => {
+  const initialState: CountState = 0;
+  const coreStore = createCoreStore<AllCountState, AllTestEvents>({
+    count: (state = initialState, event: AllTestEvents) => {
+      switch (event.type) {
+        case 'count/incrementAmount':
+          return state + event.payload;
+        case 'count/increment':
+          return state + 1;
+        default:
+          return state;
+      }
+    }
+  });
+  coreStore.registerEffect((event$) => event$.pipe(
+    mapTo({type: 'count/incrementAmount', payload: 2})
+  ));
+  coreStore.send({type: 'count/increment'});
+  m.expect(coreStore.state$).toBeObservable(m.cold('3', {'3': { count: 3 }}));
 }));
