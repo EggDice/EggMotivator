@@ -1,5 +1,5 @@
 import { createCoreStoreSlice } from '@core/store';
-import type { PayloadStoreEvent } from '@core/store';
+import type { PayloadStoreEvent, StoreEvent } from '@core/store';
 
 export interface ScheduleState {
   scheduleStatus: 'initial' | 'off' | 'on';
@@ -26,6 +26,8 @@ export type ScheduleEventOff = PayloadStoreEvent<
   'schedule/setSchedule',
   SchedulePayloadOff
 >;
+
+export type ScheduleEventInitialize = StoreEvent<'schedule/initialize'>;
 
 export type ScheduleEvent = PayloadStoreEvent
  | ScheduleEventOn
