@@ -3,7 +3,6 @@ import type {
   NotificationRequest,
   NotificationRequestInput
 } from 'expo-notifications';
-
 import type { ExpoNotifications } from './notifications-expo-external';
 
 export const fakeExpoNotifications = (): ExpoNotifications => {

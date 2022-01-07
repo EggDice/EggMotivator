@@ -1,3 +1,5 @@
+import type { Observable } from 'rxjs';
+
 export interface IntervalNotificationSchedule {
   title: string;
   body: string;
@@ -10,8 +12,8 @@ export interface IntervalNotification extends IntervalNotificationSchedule {
 
 export interface NotificationService {
   setIntervalNotification(schedule: IntervalNotificationSchedule):
-    Promise<string>;
-  clearIntervalNotification(id: string): Promise<void>;
-  getIntervalNotifications(): Promise<IntervalNotification[]>;
-  clearAllIntervalNotification(): Promise<void>;
+    Observable<string>;
+  clearIntervalNotification(id: string): Observable<void>;
+  getIntervalNotifications(): Observable<IntervalNotification[]>;
+  clearAllIntervalNotifications(): Observable<void>;
 };

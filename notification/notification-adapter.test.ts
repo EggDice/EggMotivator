@@ -1,5 +1,6 @@
 import { notificationAdapter } from './notification-adapter';
 import { fakeExpoNotifications } from './fake-notifications-expo-external';
+import { firstValueFrom } from 'rxjs';
 
 test('Init expo notification on creation', () => {
   const { mockExpoNotifications } = createNotificationService();
@@ -13,11 +14,13 @@ test('Start notification interval', async () => {
     notificationService,
   } = createNotificationService();
 
-  const id = await notificationService.setIntervalNotification({
-    title: 'hello',
-    body: 'this is it',
-    interval: 10000,
-  });
+  const id = await firstValueFrom(
+    notificationService.setIntervalNotification({
+      title: 'hello',
+      body: 'this is it',
+      interval: 10000,
+    })
+  );
 
   expect(await mockExpoNotifications.getAllScheduledNotificationsAsync())
     .toEqual([{
@@ -48,12 +51,17 @@ test('Stop notification interval', async () => {
     notificationService,
   } = createNotificationService();
 
-  const id = await notificationService.setIntervalNotification({
-    title: 'hello',
-    body: 'this is it',
-    interval: 10000,
+  const id = await mockExpoNotifications.scheduleNotificationAsync({
+    content: {
+      title: 'hello',
+      body: 'this is it',
+    },
+    trigger: {
+      seconds: 10,
+      repeats: true,
+    },
   });
-  await notificationService.clearIntervalNotification(id);
+  await firstValueFrom(notificationService.clearIntervalNotification(id));
 
   expect(await mockExpoNotifications.getAllScheduledNotificationsAsync())
     .toEqual([]);
@@ -86,7 +94,7 @@ test('List scheduled interval notifications', async () => {
     },
   });
 
-  expect(await notificationService.getIntervalNotifications())
+  expect(await firstValueFrom(notificationService.getIntervalNotifications()))
     .toEqual([{
         title: 'hello',
         body: 'this is it',
@@ -126,7 +134,7 @@ test('Clear all interval notiications', async () => {
       repeats: true,
     },
   });
-  await notificationService.clearAllIntervalNotification();
+  await notificationService.clearAllIntervalNotifications();
   expect(await mockExpoNotifications.getAllScheduledNotificationsAsync())
     .toEqual([]);
 });

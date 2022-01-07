@@ -1,3 +1,6 @@
+import { from } from 'rxjs';
+import type { Observable } from 'rxjs';
+
 import type {
   NotificationRequest,
   TimeIntervalNotificationTrigger,
@@ -23,7 +26,7 @@ export const notificationAdapter =
 
   const setIntervalNotification = (
     { title, body, interval }: IntervalNotificationSchedule
-  ): Promise<string> =>
+  ): Observable<string> => from(
     expoNotifications.scheduleNotificationAsync({
       content: {
         title,
@@ -33,20 +36,23 @@ export const notificationAdapter =
         seconds: interval / MILISECONDS,
         repeats: true,
       },
-    });
+    })
+  );
 
-  const clearIntervalNotification = (id: string): Promise<void> =>
-    expoNotifications.cancelScheduledNotificationAsync(id);
+  const clearIntervalNotification = (id: string): Observable<void> => from(
+    expoNotifications.cancelScheduledNotificationAsync(id)
+  );
 
   const getIntervalNotifications =
-        async (): Promise<IntervalNotification[]> => {
+      (): Observable<IntervalNotification[]> => from((async() => {
     const notifications =
       await expoNotifications.getAllScheduledNotificationsAsync();
     return notifications.map(toIntervalNotification);
-  };
+  })());
 
-  const clearAllIntervalNotification = (): Promise<void> =>
-    expoNotifications.cancelAllScheduledNotificationsAsync();
+  const clearAllIntervalNotifications = (): Observable<void> => from(
+    expoNotifications.cancelAllScheduledNotificationsAsync()
+  );
 
   const toIntervalNotification = ({
       content: { title, body },
@@ -67,6 +73,6 @@ export const notificationAdapter =
     setIntervalNotification,
     clearIntervalNotification,
     getIntervalNotifications,
-    clearAllIntervalNotification,
+    clearAllIntervalNotifications,
   };
 };
