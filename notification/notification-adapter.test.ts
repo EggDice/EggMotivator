@@ -1,6 +1,7 @@
 import { notificationAdapter } from './notification-adapter';
 import { fakeExpoNotifications } from './fake-notifications-expo-external';
 import { firstValueFrom } from 'rxjs';
+import { CoreError } from '@core/error';
 
 test('Init expo notification on creation', () => {
   const { mockExpoNotifications } = createNotificationService();
@@ -45,6 +46,29 @@ test('Start notification interval', async () => {
   expect(id).toBe('0');
 });
 
+test('Scheduling error propagation', async () => {
+  const {
+    mockExpoNotifications,
+    notificationService,
+  } = createNotificationService();
+
+  const cause = new Error('original error');
+
+  mockExpoNotifications.scheduleNotificationAsync = async () => {
+    throw cause;
+  }
+
+  await expect(firstValueFrom(notificationService.setIntervalNotification({
+    title: 'hello',
+    body: 'this is it',
+    interval: 1000,
+  })))
+    .rejects.toEqual(
+      new CoreError('Could not schedule notification', { cause })
+    );
+});
+
+
 test('Stop notification interval', async () => {
   const {
     mockExpoNotifications,
@@ -65,6 +89,26 @@ test('Stop notification interval', async () => {
 
   expect(await mockExpoNotifications.getAllScheduledNotificationsAsync())
     .toEqual([]);
+});
+
+test('Clearing error propagation', async () => {
+  const {
+    mockExpoNotifications,
+    notificationService,
+  } = createNotificationService();
+
+  const cause = new Error('original error');
+
+  mockExpoNotifications.cancelScheduledNotificationAsync = async () => {
+    throw cause;
+  }
+
+  await expect(firstValueFrom(notificationService.clearIntervalNotification(
+    '1',
+  )))
+    .rejects.toEqual(
+      new CoreError('Could not clear notification', { cause })
+    );
 });
 
 test('List scheduled interval notifications', async () => {
@@ -108,7 +152,25 @@ test('List scheduled interval notifications', async () => {
     }]);
 });
 
-test('Clear all interval notiications', async () => {
+test('List error propagation', async () => {
+  const {
+    mockExpoNotifications,
+    notificationService,
+  } = createNotificationService();
+
+  const cause = new Error('original error');
+
+  mockExpoNotifications.getAllScheduledNotificationsAsync = async () => {
+    throw cause;
+  }
+
+  await expect(firstValueFrom(notificationService.getIntervalNotifications()))
+    .rejects.toEqual(
+      new CoreError('Unable to check the scheduled notifications', { cause })
+    );
+});
+
+test('Clear all interval notifications', async () => {
   const {
     mockExpoNotifications,
     notificationService,
@@ -137,6 +199,25 @@ test('Clear all interval notiications', async () => {
   await notificationService.clearAllIntervalNotifications();
   expect(await mockExpoNotifications.getAllScheduledNotificationsAsync())
     .toEqual([]);
+});
+
+test('Clearing all error propagation', async () => {
+  const {
+    mockExpoNotifications,
+    notificationService,
+  } = createNotificationService();
+
+  const cause = new Error('original error');
+
+  mockExpoNotifications.cancelAllScheduledNotificationsAsync = async () => {
+    throw cause;
+  }
+
+  await expect(
+    firstValueFrom(notificationService.clearAllIntervalNotifications()))
+      .rejects.toEqual(
+        new CoreError('Could not clear notifications', { cause })
+      );
 });
 
 const createNotificationService = () => {

@@ -1,5 +1,7 @@
-import { from } from 'rxjs';
-import type { Observable } from 'rxjs';
+import { from, throwError } from 'rxjs';
+import type { Observable, MonoTypeOperatorFunction } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
+import { CoreError } from '@core/error';
 
 import type {
   NotificationRequest,
@@ -37,22 +39,31 @@ export const notificationAdapter =
         repeats: true,
       },
     })
+  ).pipe(
+    rethrowError('Could not schedule notification'),
   );
 
   const clearIntervalNotification = (id: string): Observable<void> => from(
-    expoNotifications.cancelScheduledNotificationAsync(id)
+    expoNotifications.cancelScheduledNotificationAsync(id),
+  ).pipe(
+    rethrowError('Could not clear notification'),
   );
 
   const getIntervalNotifications =
-      (): Observable<IntervalNotification[]> => from((async() => {
-    const notifications =
-      await expoNotifications.getAllScheduledNotificationsAsync();
-    return notifications.map(toIntervalNotification);
-  })());
+      (): Observable<IntervalNotification[]> =>
+    from(expoNotifications.getAllScheduledNotificationsAsync()).pipe(
+      map((notifications) => notifications.map(toIntervalNotification)),
+      rethrowError('Unable to check the scheduled notifications'),
+    );
 
   const clearAllIntervalNotifications = (): Observable<void> => from(
     expoNotifications.cancelAllScheduledNotificationsAsync()
+  ).pipe(
+    rethrowError('Could not clear notifications')
   );
+
+  const rethrowError = <T>(message: string): MonoTypeOperatorFunction<T> =>
+    catchError((cause) => throwError(() => new CoreError(message, { cause })));
 
   const toIntervalNotification = ({
       content: { title, body },
