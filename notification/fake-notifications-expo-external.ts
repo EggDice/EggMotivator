@@ -1,3 +1,4 @@
+import { addErrorMethodsToFake } from '@core/fake';
 import type {
   NotificationHandler,
   NotificationRequest,
@@ -5,7 +6,8 @@ import type {
 } from 'expo-notifications';
 import type { ExpoNotifications } from './notifications-expo-external';
 
-export const fakeExpoNotifications = (): ExpoNotifications => {
+export const fakeExpoNotifications =
+    addErrorMethodsToFake((): ExpoNotifications => {
   let notifications: NotificationRequest[] = [];
 
   return {
@@ -45,4 +47,4 @@ export const fakeExpoNotifications = (): ExpoNotifications => {
     },
     getAllScheduledNotificationsAsync: async () => notifications,
   };
-};
+});

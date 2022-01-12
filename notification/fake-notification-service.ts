@@ -1,6 +1,8 @@
 import { of } from 'rxjs';
 import { delay } from "rxjs/operators";
 
+import { addErrorMethodsToFake } from '@core/fake';
+
 import type { Observable } from 'rxjs';
 import type {
   NotificationService,
@@ -12,7 +14,8 @@ import type {
  * Because rxjs-marbles can't handle promises,
  * it is needed to fake the service as well
  */
-export const fakeNotificationService = (): NotificationService => {
+export const fakeNotificationService =
+    addErrorMethodsToFake((): NotificationService => {
   let notifications: IntervalNotification[] = [];
   return {
     setIntervalNotification: (schedule: IntervalNotificationSchedule):
@@ -35,4 +38,4 @@ export const fakeNotificationService = (): NotificationService => {
       return of(undefined).pipe(delay(1));
     }
   };
-};
+});

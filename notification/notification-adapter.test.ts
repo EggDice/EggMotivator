@@ -47,16 +47,13 @@ test('Start notification interval', async () => {
 });
 
 test('Scheduling error propagation', async () => {
+  const cause = new Error('original error');
   const {
     mockExpoNotifications,
     notificationService,
-  } = createNotificationService();
-
-  const cause = new Error('original error');
-
-  mockExpoNotifications.scheduleNotificationAsync = async () => {
-    throw cause;
-  }
+  } = createNotificationService({
+    scheduleNotificationAsync: { type: 'async', error: cause, },
+  });
 
   await expect(firstValueFrom(notificationService.setIntervalNotification({
     title: 'hello',
@@ -92,16 +89,13 @@ test('Stop notification interval', async () => {
 });
 
 test('Clearing error propagation', async () => {
+  const cause = new Error('original error');
   const {
     mockExpoNotifications,
     notificationService,
-  } = createNotificationService();
-
-  const cause = new Error('original error');
-
-  mockExpoNotifications.cancelScheduledNotificationAsync = async () => {
-    throw cause;
-  }
+  } = createNotificationService({
+    cancelScheduledNotificationAsync: { type: 'async', error: cause },
+  });
 
   await expect(firstValueFrom(notificationService.clearIntervalNotification(
     '1',
@@ -153,16 +147,13 @@ test('List scheduled interval notifications', async () => {
 });
 
 test('List error propagation', async () => {
+  const cause = new Error('original error');
   const {
     mockExpoNotifications,
     notificationService,
-  } = createNotificationService();
-
-  const cause = new Error('original error');
-
-  mockExpoNotifications.getAllScheduledNotificationsAsync = async () => {
-    throw cause;
-  }
+  } = createNotificationService({
+    getAllScheduledNotificationsAsync: { type: 'async', error: cause, },
+  });
 
   await expect(firstValueFrom(notificationService.getIntervalNotifications()))
     .rejects.toEqual(
@@ -202,16 +193,13 @@ test('Clear all interval notifications', async () => {
 });
 
 test('Clearing all error propagation', async () => {
+  const cause = new Error('original error');
   const {
     mockExpoNotifications,
     notificationService,
-  } = createNotificationService();
-
-  const cause = new Error('original error');
-
-  mockExpoNotifications.cancelAllScheduledNotificationsAsync = async () => {
-    throw cause;
-  }
+  } = createNotificationService({
+    cancelAllScheduledNotificationsAsync: { type: 'async', error: cause, },
+  });
 
   await expect(
     firstValueFrom(notificationService.clearAllIntervalNotifications()))
@@ -220,8 +208,8 @@ test('Clearing all error propagation', async () => {
       );
 });
 
-const createNotificationService = () => {
-  const mockExpoNotifications = fakeExpoNotifications();
+const createNotificationService = (configs = {}) => {
+  const mockExpoNotifications = fakeExpoNotifications(configs);
   jest.spyOn(mockExpoNotifications, 'setNotificationHandler');
   return {
     mockExpoNotifications,
