@@ -17,6 +17,7 @@ module.exports = function(api) {
             '@app': './app',
             '@notification': './notification',
             '@schedule': './schedule',
+            '@alert': './alert',
           },
         },
       ],

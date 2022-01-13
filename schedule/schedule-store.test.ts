@@ -1,11 +1,12 @@
-import { marbles } from 'rxjs-marbles/jest';
-import { createCoreStore } from '@core/store';
 import { scheduleSlice } from './schedule-store';
 import type {
   ScheduleState,
 } from './schedule-store';
 
-test('Default state is loading', marbles((m) => {
+import { coreMarbles } from '@core/marbles';
+import { createCoreStore } from '@core/store';
+
+test('Default state is loading', coreMarbles((m) => {
   const slice = scheduleSlice();
   const store = createCoreStore({schedule: slice.reducer});
   m.expect(store.state$).toBeObservable('L', {'L': {

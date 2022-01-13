@@ -1,10 +1,17 @@
 import { appStore } from './app-store';
-import { marbles } from 'rxjs-marbles/jest';
+import { coreMarbles } from '@core/marbles';
 import { map } from 'rxjs/operators';
 
-test('Should have schedule', marbles((m) => {
+test('Should have schedule', coreMarbles((m) => {
   const store = appStore();
   const keys$ = store.state$.pipe(map((state) =>
     Object.keys(state).filter((key) => key === 'schedule')));
   m.expect(keys$).toBeObservable('s', {'s': ['schedule']});
+}));
+
+test('Should have alert', coreMarbles((m) => {
+  const store = appStore();
+  const keys$ = store.state$.pipe(map((state) =>
+    Object.keys(state).filter((key) => key === 'alert')));
+  m.expect(keys$).toBeObservable('a', {'a': ['alert']});
 }));
