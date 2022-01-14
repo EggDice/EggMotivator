@@ -1,11 +1,14 @@
 import { createCoreStoreSlice } from '@core/store';
 import type { PayloadStoreEvent } from '@core/store';
 
-export interface Metric {
+export interface RawMetric {
   type: string;
-  timestamp: string;
   level: 'debug' | 'info' | 'warn' | 'error';
   payload: any;
+}
+
+export interface Metric extends RawMetric {
+  timestamp: string;
 };
 
 export interface MetricState {
@@ -13,6 +16,7 @@ export interface MetricState {
 };
 
 export type MetricEventPush = PayloadStoreEvent<Metric>;
+export type MetricEventRawPush = PayloadStoreEvent<RawMetric>;
 
 
 const initialState: MetricState = {
@@ -24,9 +28,17 @@ export const metricSlice = () => createCoreStoreSlice({
   initialState,
   reducers: {
     pushMetric,
+    pushRawMetric,
   },
 });
 
 const pushMetric = (state: MetricState, event: MetricEventPush) => ({
   toLog: [...state.toLog, event.payload],
+});
+
+const pushRawMetric = (state: MetricState, event: MetricEventRawPush) => ({
+  toLog: [
+    ...state.toLog,
+    { ...event.payload, timestamp: new Date().toISOString() },
+  ]
 });

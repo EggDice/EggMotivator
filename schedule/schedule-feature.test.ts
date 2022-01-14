@@ -1,5 +1,5 @@
 import { throwError, timer } from 'rxjs';
-import { mergeMap } from 'rxjs/operators';
+import { mergeMap, map, distinctUntilChanged } from 'rxjs/operators';
 import { coreMarbles } from '@core/marbles';
 import { appStore } from '@app/app-store';
 import {
@@ -26,15 +26,73 @@ test('init should recognize old notifications scheduled', coreMarbles((m) => {
   m.expect(schedule.isOn$).toBeObservable(m.coldBoolean('ft'));
 }));
 
-test('init should show an error if unable to read notifications',
+test('init should set it off if unable to read notifications',
      coreMarbles((m) => {
   const error = new Error('Unable to check if notifications are scheduled');
-  const { schedule } = createFeature({
+  const { schedule, } = createFeature({
     getIntervalNotifications: { type: 'observable', error }
   });
   schedule.initialize();
-  m.expect(schedule.isLoaded$).toBeObservable(m.coldBoolean('ft'));
-  m.expect(schedule.isOn$).toBeObservable(m.coldBoolean('ff'));
+  const isLoaded$ = schedule.isLoaded$.pipe(distinctUntilChanged());
+  m.expect(isLoaded$).toBeObservable(m.coldBoolean('ft'));
+  const isOn$ = schedule.isOn$.pipe(distinctUntilChanged());
+  m.expect(isOn$).toBeObservable(m.coldBoolean('f'));
+}));
+
+test('init should show an alert if unable to read notifications',
+     coreMarbles((m) => {
+  jest
+    .useFakeTimers()
+    .setSystemTime(new Date('2022-01-13T16:21:38.123Z').getTime());
+  const error = new Error('Unable to check if notifications are scheduled');
+  const { schedule, store, } = createFeature({
+    getIntervalNotifications: { type: 'observable', error }
+  });
+  schedule.initialize();
+  const alertState$ = store.state$.pipe(
+    map(({ alert }) => alert),
+    distinctUntilChanged(),
+  );
+  m.expect(alertState$).toBeObservable('01', {
+    '0': {
+      display: [],
+    },
+    '1': {
+      display: [{
+        message: 'Could not check scheduled notifications',
+        timestamp: '2022-01-13T16:21:38.123Z',
+      }],
+    },
+  });
+}));
+
+test('init should log if unable to read notifications',
+     coreMarbles((m) => {
+  jest
+    .useFakeTimers()
+    .setSystemTime(new Date('2022-01-13T16:21:38.123Z').getTime());
+  const error = new Error('Unable to check if notifications are scheduled');
+  const { schedule, store, } = createFeature({
+    getIntervalNotifications: { type: 'observable', error }
+  });
+  schedule.initialize();
+  const metricState$ = store.state$.pipe(
+    map(({ metric }) => metric),
+    distinctUntilChanged(),
+  );
+  m.expect(metricState$).toBeObservable('01', {
+    '0': {
+      toLog: [],
+    },
+    '1': {
+      toLog: [{
+        type: 'ERROR_NOTIFICATIONS_UNABLE_TO_LOAD',
+        level: 'error',
+        payload: { exception: error },
+        timestamp: '2022-01-13T16:21:38.123Z',
+      }],
+    },
+  });
 }));
 
 test('turn on and off the schedule', coreMarbles((m) => {
@@ -51,5 +109,5 @@ const createFeature = (configs = {}) => {
   const store = appStore();
   const notificationService = fakeNotificationService(configs);
   const schedule = createSchedule({ store, notificationService });
-  return { schedule, notificationService };
+  return { schedule, store, notificationService };
 };

@@ -20,17 +20,39 @@ test('Add new metric', () => {
   };
   const state = reducer(initialState, pushMetric({
     type: 'metric',
-    timestamp: '2022-01-13T16:21:38Z',
+    timestamp: '2022-01-13T16:21:38.123Z',
     level: 'info',
     payload: 1,
   }));
   expect(state).toEqual({
     toLog: [{
       type: 'metric',
-      timestamp: '2022-01-13T16:21:38Z',
+      timestamp: '2022-01-13T16:21:38.123Z',
       level: 'info',
       payload: 1,
     }],
   });
 });
 
+test('Add new raw metric', () => {
+  jest
+    .useFakeTimers()
+    .setSystemTime(new Date('2022-01-13T16:21:38.123Z').getTime());
+  const { reducer, eventCreators: { pushRawMetric } } = metricSlice();
+  const initialState = {
+    toLog: [],
+  };
+  const state = reducer(initialState, pushRawMetric({
+    type: 'metric',
+    level: 'info',
+    payload: 1,
+  }));
+  expect(state).toEqual({
+    toLog: [{
+      type: 'metric',
+      timestamp: '2022-01-13T16:21:38.123Z',
+      level: 'info',
+      payload: 1,
+    }],
+  });
+});

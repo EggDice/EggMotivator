@@ -14,18 +14,20 @@ test('Default state is loading', coreMarbles((m) => {
 }));
 
 test('Add new alert', () => {
+  jest
+    .useFakeTimers()
+    .setSystemTime(new Date('2022-01-13T16:21:38.123Z').getTime());
   const { reducer, eventCreators: { showAlert } } = alertSlice();
   const initialState = {
     display: [],
   };
   const state = reducer(initialState, showAlert({
     message: 'Something bad happened',
-    timestamp: '2022-01-13T16:21:38Z',
   }));
   expect(state).toEqual({
     display: [{
       message: 'Something bad happened',
-      timestamp: '2022-01-13T16:21:38Z',
+      timestamp: '2022-01-13T16:21:38.123Z',
     }],
   });
 });

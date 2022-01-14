@@ -1,8 +1,11 @@
 import { createCoreStoreSlice } from '@core/store';
 import type { PayloadStoreEvent } from '@core/store';
 
-export interface Alert {
+export interface RawAlert {
   message: string;
+}
+
+export interface Alert extends RawAlert {
   timestamp: string;
 };
 
@@ -10,7 +13,7 @@ export interface AlertState {
   display: Alert[];
 };
 
-export type AlertEventShow = PayloadStoreEvent<Alert>;
+export type AlertEventShow = PayloadStoreEvent<RawAlert>;
 
 
 const initialState: AlertState = {
@@ -26,5 +29,8 @@ export const alertSlice = () => createCoreStoreSlice({
 });
 
 const showAlert = (state: AlertState, event: AlertEventShow) => ({
-  display: [...state.display, event.payload],
+  display: [
+    ...state.display,
+    { ...event.payload, timestamp: new Date().toISOString() },
+  ],
 });
