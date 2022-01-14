@@ -15,3 +15,10 @@ test('Should have alert', coreMarbles((m) => {
     Object.keys(state).filter((key) => key === 'alert')));
   m.expect(keys$).toBeObservable('a', {'a': ['alert']});
 }));
+
+test('Should have metric', coreMarbles((m) => {
+  const store = appStore();
+  const keys$ = store.state$.pipe(map((state) =>
+    Object.keys(state).filter((key) => key === 'metric')));
+  m.expect(keys$).toBeObservable('m', {'m': ['metric']});
+}));

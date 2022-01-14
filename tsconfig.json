@@ -8,7 +8,8 @@
       "@app/*": ["app/*"],
       "@notification/*": ["notification/*"],
       "@schedule/*": ["schedule/*"],
-      "@alert/*": ["alert/*"]
+      "@alert/*": ["alert/*"],
+      "@metric/*": ["metric/*"]
     }
   }
 }

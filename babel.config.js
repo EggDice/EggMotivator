@@ -18,6 +18,7 @@ module.exports = function(api) {
             '@notification': './notification',
             '@schedule': './schedule',
             '@alert': './alert',
+            '@metric': './metric',
           },
         },
       ],
