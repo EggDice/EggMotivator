@@ -10,8 +10,35 @@ import { createSchedule } from './schedule-feature';
 test('init with no notifications scheduled', coreMarbles((m) => {
   const { schedule } = createFeature();
   schedule.initialize();
-  m.expect(schedule.isLoaded$).toBeObservable(m.coldBoolean('ft'));
-  m.expect(schedule.isOn$).toBeObservable(m.coldBoolean('ff'));
+  const isLoaded$ = schedule.isLoaded$.pipe(distinctUntilChanged());
+  m.expect(isLoaded$).toBeObservable(m.coldBoolean('ft'));
+  const isOn$ = schedule.isOn$.pipe(distinctUntilChanged());
+  m.expect(isOn$).toBeObservable(m.coldBoolean('f'));
+}));
+
+test('init with no notifications scheduled should log', coreMarbles((m) => {
+  jest
+    .useFakeTimers()
+    .setSystemTime(new Date('2022-01-13T16:21:38.123Z').getTime());
+  const { schedule, store } = createFeature();
+  schedule.initialize();
+  const metricState$ = store.state$.pipe(
+    map(({ metric }) => metric),
+    distinctUntilChanged(),
+  );
+  m.expect(metricState$).toBeObservable('01', {
+    '0': {
+      toLog: [],
+    },
+    '1': {
+      toLog: [{
+        type: 'SCHEDULE_NOTIFICATIONS',
+        level: 'info',
+        payload: { state: 'off', trigger: 'init', interval: 0 },
+        timestamp: '2022-01-13T16:21:38.123Z',
+      }],
+    },
+  });
 }));
 
 test('init should recognize old notifications scheduled', coreMarbles((m) => {
@@ -22,8 +49,37 @@ test('init should recognize old notifications scheduled', coreMarbles((m) => {
     interval: 5000,
   });
   schedule.initialize();
-  m.expect(schedule.isLoaded$).toBeObservable(m.coldBoolean('ft'));
-  m.expect(schedule.isOn$).toBeObservable(m.coldBoolean('ft'));
+  const isLoaded$ = schedule.isLoaded$.pipe(distinctUntilChanged());
+  m.expect(isLoaded$).toBeObservable(m.coldBoolean('ft'));
+  const isOn$ = schedule.isOn$.pipe(distinctUntilChanged());
+  m.expect(isOn$).toBeObservable(m.coldBoolean('ft'));
+}));
+
+test('init should recognize old notifications scheduled', coreMarbles((m) => {
+  const { schedule, notificationService, store, } = createFeature();
+  notificationService.setIntervalNotification({
+    title: '',
+    body: '',
+    interval: 5000,
+  });
+  schedule.initialize();
+  const metricState$ = store.state$.pipe(
+    map(({ metric }) => metric),
+    distinctUntilChanged(),
+  );
+  m.expect(metricState$).toBeObservable('01', {
+    '0': {
+      toLog: [],
+    },
+    '1': {
+      toLog: [{
+        type: 'SCHEDULE_NOTIFICATIONS',
+        level: 'info',
+        payload: { state: 'on', trigger: 'init', interval: 5000 },
+        timestamp: '2022-01-13T16:21:38.123Z',
+      }],
+    },
+  });
 }));
 
 test('init should set it off if unable to read notifications',
@@ -88,7 +144,10 @@ test('init should log if unable to read notifications',
       toLog: [{
         type: 'ERROR_NOTIFICATIONS_UNABLE_TO_LOAD',
         level: 'error',
-        payload: { exception: error },
+        payload: {
+          stack: error.stack,
+          message: error.message,
+        },
         timestamp: '2022-01-13T16:21:38.123Z',
       }],
     },
@@ -101,8 +160,10 @@ test('turn on and off the schedule', coreMarbles((m) => {
     t: () => schedule.on({ interval: 5000 }),
     f: () => schedule.off(),
   });
-  m.expect(schedule.isLoaded$).toBeObservable(m.coldBoolean('tt'));
-  m.expect(schedule.isOn$).toBeObservable(m.coldBoolean('tf'));
+  const isLoaded$ = schedule.isLoaded$.pipe(distinctUntilChanged());
+  m.expect(isLoaded$).toBeObservable(m.coldBoolean('t'));
+  const isOn$ = schedule.isOn$.pipe(distinctUntilChanged());
+  m.expect(isOn$).toBeObservable(m.coldBoolean('tf'));
 }));
 
 const createFeature = (configs = {}) => {
