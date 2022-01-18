@@ -18,6 +18,10 @@ export interface MetricState {
 export type MetricEventPush = PayloadStoreEvent<Metric>;
 export type MetricEventRawPush = PayloadStoreEvent<RawMetric>;
 
+export type MetricEvent =
+  | MetricEventPush
+  | MetricEventRawPush
+  ;
 
 const initialState: MetricState = {
   toLog: [],

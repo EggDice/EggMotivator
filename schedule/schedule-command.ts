@@ -13,5 +13,8 @@ export const scheduleCommand = (appStore: AppStore) => {
     initialize: () => {
       appStore.send({ type: 'schedule/initialize' });
     },
+    switchOn: ({ interval }: { interval: number }) => {
+      appStore.send({ type: 'schedule/switch-on', payload: { interval } });
+    },
   };
 };

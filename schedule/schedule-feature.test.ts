@@ -17,9 +17,6 @@ test('init with no notifications scheduled', coreMarbles((m) => {
 }));
 
 test('init with no notifications scheduled should log', coreMarbles((m) => {
-  jest
-    .useFakeTimers()
-    .setSystemTime(new Date('2022-01-13T16:21:38.123Z').getTime());
   const { schedule, store } = createFeature();
   schedule.initialize();
   const metricState$ = store.state$.pipe(
@@ -97,9 +94,6 @@ test('init should set it off if unable to read notifications',
 
 test('init should show an alert if unable to read notifications',
      coreMarbles((m) => {
-  jest
-    .useFakeTimers()
-    .setSystemTime(new Date('2022-01-13T16:21:38.123Z').getTime());
   const error = new Error('Unable to check if notifications are scheduled');
   const { schedule, store, } = createFeature({
     getIntervalNotifications: { type: 'observable', error }
@@ -124,9 +118,6 @@ test('init should show an alert if unable to read notifications',
 
 test('init should log if unable to read notifications',
      coreMarbles((m) => {
-  jest
-    .useFakeTimers()
-    .setSystemTime(new Date('2022-01-13T16:21:38.123Z').getTime());
   const error = new Error('Unable to check if notifications are scheduled');
   const { schedule, store, } = createFeature({
     getIntervalNotifications: { type: 'observable', error }
@@ -154,16 +145,22 @@ test('init should log if unable to read notifications',
   });
 }));
 
-test('turn on and off the schedule', coreMarbles((m) => {
-  const { schedule } = createFeature();
-  m.coldCall('tf', {
-    t: () => schedule.on({ interval: 5000 }),
-    f: () => schedule.off(),
+test('switch on schedule', coreMarbles((m) => {
+  const { schedule, notificationService, } = createFeature();
+  schedule.switchOn({ interval: 5 * 60 * 1000 });
+  const notifications$ = notificationService.getIntervalNotifications();
+  m.expect(notifications$).toBeObservable('-(1|)', {
+    '1': [{
+      title: 'Ping',
+      body: '5 minutes passed',
+      interval: 5 * 60 * 1000,
+      id: '0',
+    }],
   });
   const isLoaded$ = schedule.isLoaded$.pipe(distinctUntilChanged());
-  m.expect(isLoaded$).toBeObservable(m.coldBoolean('t'));
+  m.expect(isLoaded$).toBeObservable(m.coldBoolean('ft'));
   const isOn$ = schedule.isOn$.pipe(distinctUntilChanged());
-  m.expect(isOn$).toBeObservable(m.coldBoolean('tf'));
+  m.expect(isOn$).toBeObservable(m.coldBoolean('ft'));
 }));
 
 const createFeature = (configs = {}) => {
@@ -172,3 +169,9 @@ const createFeature = (configs = {}) => {
   const schedule = createSchedule({ store, notificationService });
   return { schedule, store, notificationService };
 };
+
+beforeEach(() => {
+  jest
+    .useFakeTimers()
+    .setSystemTime(new Date('2022-01-13T16:21:38.123Z').getTime());
+});

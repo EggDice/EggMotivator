@@ -15,6 +15,9 @@ export interface AlertState {
 
 export type AlertEventShow = PayloadStoreEvent<RawAlert>;
 
+export type AlertEvent =
+  | AlertEventShow
+  ;
 
 const initialState: AlertState = {
   display: [],

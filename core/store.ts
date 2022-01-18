@@ -81,13 +81,13 @@ export type CoreEffect<EVENT> =
 
 export const createCoreStore = <
   STATE,
-  EVENT extends StoreEvent
+  EVENT extends StoreEvent | PayloadStoreEvent
 > (reducer: CoreReducersObject<STATE, EVENT>): CoreStore<STATE, EVENT> => {
   const store = configureStore({ reducer });
   const event$ = new Subject<EVENT>();
-  const streams$ = new Subject<Observable<EVENT>>();
-  streams$.pipe(mergeAll()).subscribe((event) => store.dispatch(event));
-  streams$.next(event$);
+  const event$$ = new Subject<Observable<EVENT>>();
+  event$$.pipe(mergeAll()).subscribe((event) => store.dispatch(event));
+  event$$.next(event$);
   return {
     state$: new Observable(subscriber => {
       subscriber.next(store.getState());
@@ -99,7 +99,7 @@ export const createCoreStore = <
       event$.next(action);
     },
     registerEffect: (effect) => {
-      streams$.next(effect(event$));
+      event$$.next(effect(event$));
     }
   };
 };

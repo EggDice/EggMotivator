@@ -3,17 +3,18 @@ import { scheduleCommand } from './schedule-command';
 import { scheduleSlice } from './schedule-store';
 import { alertSlice } from '@alert/alert-store';
 import { metricSlice } from '@metric/metric-store';
+import { filterByType } from '@core/effect';
 
 import { of } from 'rxjs';
-import { filter, mergeMap, catchError } from 'rxjs/operators';
+import { mergeMap, catchError, map } from 'rxjs/operators';
 
 import type { Observable } from 'rxjs';
 import type {
   NotificationService,
   IntervalNotification,
 } from '@notification/notification';
-import type { StoreEvent } from '@core/store';
-import type { AppStore } from '@app/app-store';
+import type { AppStore, AppStoreEvent } from '@app/app-store';
+import type { ScheduleEventSwitchOn } from './schedule-store';
 
 type ScheduleServiceArgs = {
   store: AppStore,
@@ -31,14 +32,29 @@ export const createSchedule =
   const query = scheduleQuery(store);
   const command = scheduleCommand(store);
 
-  const handleInitEffect = (event$: Observable<StoreEvent>) => event$.pipe(
-    filter(({type}) => type === 'schedule/initialize'),
+  const handleInitEffect = (event$: Observable<AppStoreEvent>) => event$.pipe(
+    filterByType<AppStoreEvent>('schedule/initialize'),
     mergeMap(() => notificationService.getIntervalNotifications().pipe(
       mergeMap(turnOnOrOffAfterInit),
       catchError(handleGetNotificationsError),
     )),
   );
   store.registerEffect(handleInitEffect);
+
+  const handleSwitchOn = (event$: Observable<AppStoreEvent>) => event$.pipe(
+    filterByType<AppStoreEvent>('schedule/switch-on'),
+    mergeMap(
+      ({ payload: { interval }}) =>
+        notificationService.setIntervalNotification({
+          title: 'Ping',
+          body: '5 minutes passed',
+          interval,
+        }).pipe(
+          map(() => setSchedule({ scheduleStatus: 'on', interval }))
+        )
+    )
+  );
+  store.registerEffect(handleSwitchOn);
 
   const { eventCreators: { setSchedule } } = scheduleSlice();
   const { eventCreators: { showAlert } } = alertSlice();
@@ -89,7 +105,8 @@ export const createSchedule =
 
 
   return {
-    ...command,
+    switchOn: command.switchOn,
+    initialize: command.initialize,
     ...query,
   };
 };
