@@ -1,20 +1,28 @@
-import type { AppStore } from '@app/app-store';
-import { scheduleSlice } from './schedule-store';
+import { scheduleSlice } from './schedule-store'
+import type { CoreCommand } from '@core/command'
+import type { AppStore } from '@app/app-store'
 
-export const scheduleCommand = (appStore: AppStore) => {
-  const { eventCreators: { setSchedule } } = scheduleSlice();
+interface ScheduleCommand extends CoreCommand {
+  on: (arg: { interval: number }) => void
+  off: () => void
+  initialize: () => void
+  switchOn: (arg: { interval: number }) => void
+}
+
+export const scheduleCommand = (appStore: AppStore): ScheduleCommand => {
+  const { eventCreators: { setSchedule } } = scheduleSlice()
   return {
     on: ({ interval }: { interval: number }) => {
-      appStore.send(setSchedule({ scheduleStatus: 'on', interval }));
+      appStore.send(setSchedule({ scheduleStatus: 'on', interval }))
     },
     off: () => {
-      appStore.send(setSchedule({ scheduleStatus: 'off', interval: 0 }));
+      appStore.send(setSchedule({ scheduleStatus: 'off', interval: 0 }))
     },
     initialize: () => {
-      appStore.send({ type: 'schedule/initialize' });
+      appStore.send({ type: 'schedule/initialize' })
     },
     switchOn: ({ interval }: { interval: number }) => {
-      appStore.send({ type: 'schedule/switch-on', payload: { interval } });
+      appStore.send({ type: 'schedule/switch-on', payload: { interval } })
     },
-  };
-};
+  }
+}

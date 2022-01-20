@@ -1,48 +1,52 @@
-import { createCoreStoreSlice } from '@core/store';
-import type { PayloadStoreEvent } from '@core/store';
+import { createCoreStoreSlice } from '@core/store'
+import type { PayloadStoreEvent, CoreStoreSlice } from '@core/store'
 
 export interface RawMetric {
-  type: string;
-  level: 'debug' | 'info' | 'warn' | 'error';
-  payload: any;
+  type: string
+  level: 'debug' | 'info' | 'warn' | 'error'
+  payload: any
 }
 
 export interface Metric extends RawMetric {
-  timestamp: string;
+  timestamp: string
 };
 
 export interface MetricState {
-  toLog: Metric[];
+  toLog: Metric[]
 };
 
-export type MetricEventPush = PayloadStoreEvent<Metric>;
-export type MetricEventRawPush = PayloadStoreEvent<RawMetric>;
+export type MetricEventPush = PayloadStoreEvent<Metric>
+export type MetricEventRawPush = PayloadStoreEvent<RawMetric>
 
 export type MetricEvent =
   | MetricEventPush
   | MetricEventRawPush
-  ;
 
 const initialState: MetricState = {
   toLog: [],
-};
+}
 
-export const metricSlice = () => createCoreStoreSlice({
-  name: 'metric',
-  initialState,
-  reducers: {
-    pushMetric,
-    pushRawMetric,
-  },
-});
+export const metricSlice = (): CoreStoreSlice<MetricState, typeof reducers> =>
+  createCoreStoreSlice({
+    name: 'metric',
+    initialState,
+    reducers,
+  })
 
-const pushMetric = (state: MetricState, event: MetricEventPush) => ({
-  toLog: [...state.toLog, event.payload],
-});
+const pushMetric = (state: MetricState, event: MetricEventPush): MetricState =>
+  ({
+    toLog: [...state.toLog, event.payload],
+  })
 
-const pushRawMetric = (state: MetricState, event: MetricEventRawPush) => ({
-  toLog: [
-    ...state.toLog,
-    { ...event.payload, timestamp: new Date().toISOString() },
-  ]
-});
+const pushRawMetric =
+  (state: MetricState, event: MetricEventRawPush): MetricState => ({
+    toLog: [
+      ...state.toLog,
+      { ...event.payload, timestamp: new Date().toISOString() },
+    ],
+  })
+
+const reducers = {
+  pushMetric,
+  pushRawMetric,
+}

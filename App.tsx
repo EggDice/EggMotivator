@@ -4,9 +4,9 @@ import {
   cancelScheduledNotificationAsync,
   cancelAllScheduledNotificationsAsync,
   getAllScheduledNotificationsAsync,
-} from 'expo-notifications';
+} from 'expo-notifications'
 
-import { main } from './app/main';
+import { main } from './app/main'
 
 const ExternalNotifications = {
   setNotificationHandler,
@@ -14,11 +14,11 @@ const ExternalNotifications = {
   cancelScheduledNotificationAsync,
   cancelAllScheduledNotificationsAsync,
   getAllScheduledNotificationsAsync,
-};
+}
 
 export default main({
   services: { ExternalNotifications },
   run: ({ Root }) => {
-    return Root;
+    return Root
   },
-});
+})

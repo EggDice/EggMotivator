@@ -1,65 +1,76 @@
-import { createCoreStoreSlice } from '@core/store';
-import type { PayloadStoreEvent, StoreEvent } from '@core/store';
+import { createCoreStoreSlice } from '@core/store'
+import type {
+  PayloadStoreEvent,
+  StoreEvent,
+  CoreStoreSlice,
+} from '@core/store'
+
+export type ScheduleStatus =
+  | 'initial'
+  | 'off'
+  | 'on'
 
 export interface ScheduleState {
-  scheduleStatus: 'initial' | 'off' | 'on';
-  interval: number,
-};
+  scheduleStatus: ScheduleStatus
+  interval: number
+}
 
 export interface SchedulePayloadOn {
-  scheduleStatus: 'on';
-  interval: number;
-};
+  scheduleStatus: 'on'
+  interval: number
+}
 
 export interface SchedulePayloadOff {
-  scheduleStatus: 'off';
-};
+  scheduleStatus: 'off'
+}
 
-export type SchedulePayload = SchedulePayloadOn | SchedulePayloadOff;
+export interface SchedulePayloadSwitchOn {
+  interval: number
+}
 
-export type ScheduleEventOn = PayloadStoreEvent<
-  'schedule/setSchedule',
-  SchedulePayloadOn
->;
+export type SchedulePayload = SchedulePayloadOn | SchedulePayloadOff
 
-export type ScheduleEventOff = PayloadStoreEvent<
-  'schedule/setSchedule',
-  SchedulePayloadOff
->;
+export type ScheduleEventOn =
+  PayloadStoreEvent<'schedule/setSchedule', SchedulePayloadOn>
 
-export type ScheduleEventInitialize = StoreEvent<'schedule/initialize'>;
+export type ScheduleEventOff =
+  PayloadStoreEvent<'schedule/setSchedule', SchedulePayloadOff>
 
-export type ScheduleEventSwitchOn = PayloadStoreEvent<
-  'schedule/switch-on',
-  { interval: number }
->;
+export type ScheduleEventInitialize = StoreEvent<'schedule/initialize'>
+
+export type ScheduleEventSwitchOn =
+  PayloadStoreEvent<'schedule/switch-on', ScheduleEventOnOff>
 
 type ScheduleEventOnOff =
  | PayloadStoreEvent
  | ScheduleEventOn
  | ScheduleEventOff
- ;
 
 export type ScheduleEvent =
  | ScheduleEventOnOff
  | ScheduleEventInitialize
  | ScheduleEventSwitchOn
- ;
 
 const initialState: ScheduleState = {
   scheduleStatus: 'initial',
   interval: 0,
-};
+}
 
-export const scheduleSlice = () => createCoreStoreSlice({
-  name: 'schedule',
-  initialState,
-  reducers: {
-    setSchedule,
-  },
-});
+export const scheduleSlice =
+  (): CoreStoreSlice<ScheduleState, typeof reducers> => createCoreStoreSlice({
+    name: 'schedule',
+    initialState,
+    reducers: {
+      setSchedule,
+    },
+  })
 
-const setSchedule = (state: ScheduleState, event: ScheduleEventOnOff) => ({
-  ...state,
-  ...event.payload,
-});
+const setSchedule =
+  (state: ScheduleState, event: ScheduleEventOnOff): ScheduleState => ({
+    ...state,
+    ...event.payload,
+  })
+
+const reducers = {
+  setSchedule,
+}

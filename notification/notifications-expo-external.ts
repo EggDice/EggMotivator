@@ -1,16 +1,16 @@
 import type {
   NotificationHandler,
   NotificationRequest,
-  NotificationRequestInput
-} from 'expo-notifications';
+  NotificationRequestInput,
+} from 'expo-notifications'
 
-export type ExpoNotifications = {
+export interface ExpoNotifications {
   setNotificationHandler:
-    (handler: NotificationHandler) => void,
+  (handler: NotificationHandler) => void
   scheduleNotificationAsync:
-    (request: NotificationRequestInput) => Promise<string>,
+  (request: NotificationRequestInput) => Promise<string>
   cancelScheduledNotificationAsync:
-    (id: string) => Promise<void>,
-  cancelAllScheduledNotificationsAsync: () => Promise<void>,
-  getAllScheduledNotificationsAsync: () => Promise<NotificationRequest[]>,
-};
+  (id: string) => Promise<void>
+  cancelAllScheduledNotificationsAsync: () => Promise<void>
+  getAllScheduledNotificationsAsync: () => Promise<NotificationRequest[]>
+}

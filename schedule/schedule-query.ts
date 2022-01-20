@@ -1,21 +1,28 @@
-import { map } from 'rxjs/operators';
-import type { AppStore } from '@app/app-store';
-import type { ScheduleState } from './schedule-store';
+import { map } from 'rxjs/operators'
+import type { Observable } from 'rxjs'
+import type { CoreQuery } from '@core/query'
+import type { AppStore } from '@app/app-store'
+import type { ScheduleState, ScheduleStatus } from './schedule-store'
 
-export const scheduleQuery = (store: AppStore) =>
+interface ScheduleQuery extends CoreQuery {
+  isLoaded$: Observable<boolean>
+  isOn$: Observable<boolean>
+}
+
+export const scheduleQuery = (store: AppStore): ScheduleQuery =>
   ({
     isLoaded$: store.state$.pipe(
       map(getScheduleStatus),
-      map((scheduleStatus) => scheduleStatus !== 'initial')
+      map((scheduleStatus) => scheduleStatus !== 'initial'),
     ),
     isOn$: store.state$.pipe(
       map(getScheduleStatus),
-      map((scheduleStatus) => scheduleStatus === 'on')
+      map((scheduleStatus) => scheduleStatus === 'on'),
     ),
-  });
+  })
 
 const getScheduleStatus = ({
   schedule: {
-    scheduleStatus
+    scheduleStatus,
   },
-}: { schedule: ScheduleState }) => scheduleStatus;
+}: { schedule: ScheduleState }): ScheduleStatus => scheduleStatus
