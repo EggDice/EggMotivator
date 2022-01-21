@@ -20,6 +20,7 @@ export interface ScheduleFeature {
   isLoaded$: Observable<boolean>
   initialize: () => void
   switchOn: (arg: { interval: number }) => void
+  switchOff: () => void
 }
 
 interface ScheduleServiceArgs {
@@ -61,10 +62,45 @@ export const createSchedule =
                   interval,
                 }).pipe(
                   map(() => setSchedule({ scheduleStatus: 'on', interval })),
+                  catchError((exception: Error) => of(
+                    showAlert({ message: 'Could not schedule notifications' }),
+                    pushRawMetric({
+                      type: 'ERROR_NOTIFICATIONS_UNABLE_TO_SCHEDULE',
+                      level: 'error',
+                      payload: {
+                        stack: exception.stack,
+                        message: exception.message,
+                      },
+                    }),
+                  )),
                 ),
             ),
           )
       store.registerEffect(handleSwitchOn)
+
+      const handleSwitchOff =
+        (event$: Observable<AppStoreEvent>): Observable<AppStoreEvent> =>
+          event$.pipe(
+            filterByType<AppStoreEvent>('schedule/switch-off'),
+            mergeMap(
+              () =>
+                notificationService.clearAllIntervalNotifications().pipe(
+                  map(() => setSchedule({ scheduleStatus: 'off' })),
+                  catchError((exception: Error) => of(
+                    showAlert({ message: 'Could not turn off notifications' }),
+                    pushRawMetric({
+                      type: 'ERROR_NOTIFICATIONS_UNABLE_TO_CANCEL',
+                      level: 'error',
+                      payload: {
+                        stack: exception.stack,
+                        message: exception.message,
+                      },
+                    }),
+                  )),
+                ),
+            ),
+          )
+      store.registerEffect(handleSwitchOff)
 
       const { eventCreators: { setSchedule } } = scheduleSlice()
       const { eventCreators: { showAlert } } = alertSlice()
@@ -117,6 +153,7 @@ export const createSchedule =
 
       return {
         switchOn: command.switchOn,
+        switchOff: command.switchOff,
         initialize: command.initialize,
         ...query,
       }

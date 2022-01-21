@@ -41,6 +41,8 @@ export type ScheduleEventInitialize = StoreEvent<'schedule/initialize'>
 export type ScheduleEventSwitchOn =
   PayloadStoreEvent<'schedule/switch-on', ScheduleEventOnOff>
 
+export type ScheduleEventSwitchOff = StoreEvent<'schedule/switch-off'>
+
 type ScheduleEventOnOff =
  | PayloadStoreEvent
  | ScheduleEventOn
@@ -50,6 +52,7 @@ export type ScheduleEvent =
  | ScheduleEventOnOff
  | ScheduleEventInitialize
  | ScheduleEventSwitchOn
+ | ScheduleEventSwitchOff
 
 const initialState: ScheduleState = {
   scheduleStatus: 'initial',

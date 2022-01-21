@@ -165,6 +165,126 @@ test('switch on schedule', coreMarbles((m) => {
   m.expect(isOn$).toBeObservable(m.coldBoolean('ft'))
 }))
 
+test('switch on error should show an alert', coreMarbles((m) => {
+  const error = new Error('Unable to schedule notifications')
+  const { schedule, store } = createFeature({
+    setIntervalNotification: { type: 'observable', error },
+  })
+  schedule.switchOn({ interval: 5 * 60 * 1000 })
+  const alertState$ = store.state$.pipe(
+    map(({ alert }) => alert),
+    distinctUntilChanged(),
+  )
+  m.expect(alertState$).toBeObservable('01', {
+    0: {
+      display: [],
+    },
+    1: {
+      display: [{
+        message: 'Could not schedule notifications',
+        timestamp: '2022-01-13T16:21:38.123Z',
+      }],
+    },
+  })
+}))
+
+test('switch on error should log',
+  coreMarbles((m) => {
+    const error = new Error('Unable to schedule notifications')
+    const { schedule, store } = createFeature({
+      setIntervalNotification: { type: 'observable', error },
+    })
+    schedule.switchOn({ interval: 5 * 60 * 1000 })
+    const metricState$ = store.state$.pipe(
+      map(({ metric }) => metric),
+      distinctUntilChanged(),
+    )
+    m.expect(metricState$).toBeObservable('01', {
+      0: {
+        toLog: [],
+      },
+      1: {
+        toLog: [{
+          type: 'ERROR_NOTIFICATIONS_UNABLE_TO_SCHEDULE',
+          level: 'error',
+          payload: {
+            stack: error.stack,
+            message: error.message,
+          },
+          timestamp: '2022-01-13T16:21:38.123Z',
+        }],
+      },
+    })
+  }))
+
+test('switch off schedule', coreMarbles((m) => {
+  const { schedule, notificationService } = createFeature()
+  notificationService.setIntervalNotification({
+    title: '',
+    body: '',
+    interval: 5000,
+  })
+  schedule.switchOff()
+  const notifications$ = notificationService.getIntervalNotifications()
+  m.expect(notifications$).toBeObservable('-(0|)', { 0: [] })
+  const isLoaded$ = schedule.isLoaded$.pipe(distinctUntilChanged())
+  m.expect(isLoaded$).toBeObservable(m.coldBoolean('ft'))
+  const isOn$ = schedule.isOn$.pipe(distinctUntilChanged())
+  m.expect(isOn$).toBeObservable(m.coldBoolean('f'))
+}))
+
+test('switch off error should show an alert', coreMarbles((m) => {
+  const error = new Error('Unable to cancel notifications')
+  const { schedule, store } = createFeature({
+    clearAllIntervalNotifications: { type: 'observable', error },
+  })
+  schedule.switchOff()
+  const alertState$ = store.state$.pipe(
+    map(({ alert }) => alert),
+    distinctUntilChanged(),
+  )
+  m.expect(alertState$).toBeObservable('01', {
+    0: {
+      display: [],
+    },
+    1: {
+      display: [{
+        message: 'Could not turn off notifications',
+        timestamp: '2022-01-13T16:21:38.123Z',
+      }],
+    },
+  })
+}))
+
+test('switch off error should log',
+  coreMarbles((m) => {
+    const error = new Error('Unable to schedule notifications')
+    const { schedule, store } = createFeature({
+      clearAllIntervalNotifications: { type: 'observable', error },
+    })
+    schedule.switchOff()
+    const metricState$ = store.state$.pipe(
+      map(({ metric }) => metric),
+      distinctUntilChanged(),
+    )
+    m.expect(metricState$).toBeObservable('01', {
+      0: {
+        toLog: [],
+      },
+      1: {
+        toLog: [{
+          type: 'ERROR_NOTIFICATIONS_UNABLE_TO_CANCEL',
+          level: 'error',
+          payload: {
+            stack: error.stack,
+            message: error.message,
+          },
+          timestamp: '2022-01-13T16:21:38.123Z',
+        }],
+      },
+    })
+  }))
+
 const createFeature = (configs = {}): {
   schedule: ScheduleFeature
   store: AppStore

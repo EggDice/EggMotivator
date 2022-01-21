@@ -7,6 +7,7 @@ interface ScheduleCommand extends CoreCommand {
   off: () => void
   initialize: () => void
   switchOn: (arg: { interval: number }) => void
+  switchOff: () => void
 }
 
 export const scheduleCommand = (appStore: AppStore): ScheduleCommand => {
@@ -23,6 +24,9 @@ export const scheduleCommand = (appStore: AppStore): ScheduleCommand => {
     },
     switchOn: ({ interval }: { interval: number }) => {
       appStore.send({ type: 'schedule/switch-on', payload: { interval } })
+    },
+    switchOff: () => {
+      appStore.send({ type: 'schedule/switch-off' })
     },
   }
 }
