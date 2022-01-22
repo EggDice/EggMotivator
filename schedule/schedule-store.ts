@@ -39,9 +39,9 @@ export type ScheduleEventOff =
 export type ScheduleEventInitialize = StoreEvent<'schedule/initialize'>
 
 export type ScheduleEventSwitchOn =
-  PayloadStoreEvent<'schedule/switch-on', ScheduleEventOnOff>
+  PayloadStoreEvent<'schedule/switchOn', SchedulePayloadSwitchOn>
 
-export type ScheduleEventSwitchOff = StoreEvent<'schedule/switch-off'>
+export type ScheduleEventSwitchOff = StoreEvent<'schedule/switchOff'>
 
 type ScheduleEventOnOff =
  | PayloadStoreEvent
@@ -59,15 +59,6 @@ const initialState: ScheduleState = {
   interval: 0,
 }
 
-export const scheduleSlice =
-  (): CoreStoreSlice<ScheduleState, typeof reducers> => createCoreStoreSlice({
-    name: 'schedule',
-    initialState,
-    reducers: {
-      setSchedule,
-    },
-  })
-
 const setSchedule =
   (state: ScheduleState, event: ScheduleEventOnOff): ScheduleState => ({
     ...state,
@@ -77,3 +68,12 @@ const setSchedule =
 const reducers = {
   setSchedule,
 }
+
+export const scheduleSlice: CoreStoreSlice<ScheduleState, typeof reducers> =
+  createCoreStoreSlice({
+    name: 'schedule',
+    initialState,
+    reducers: {
+      setSchedule,
+    },
+  })

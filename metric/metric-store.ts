@@ -15,8 +15,10 @@ export interface MetricState {
   toLog: Metric[]
 };
 
-export type MetricEventPush = PayloadStoreEvent<Metric>
-export type MetricEventRawPush = PayloadStoreEvent<RawMetric>
+export type MetricEventPush =
+  PayloadStoreEvent<'metric/pushRawMetric', Metric>
+export type MetricEventRawPush =
+  PayloadStoreEvent<'metric/pushRawMetric', RawMetric>
 
 export type MetricEvent =
   | MetricEventPush
@@ -25,13 +27,6 @@ export type MetricEvent =
 const initialState: MetricState = {
   toLog: [],
 }
-
-export const metricSlice = (): CoreStoreSlice<MetricState, typeof reducers> =>
-  createCoreStoreSlice({
-    name: 'metric',
-    initialState,
-    reducers,
-  })
 
 const pushMetric = (state: MetricState, event: MetricEventPush): MetricState =>
   ({
@@ -50,3 +45,10 @@ const reducers = {
   pushMetric,
   pushRawMetric,
 }
+
+export const metricSlice: CoreStoreSlice<MetricState, typeof reducers> =
+  createCoreStoreSlice({
+    name: 'metric',
+    initialState,
+    reducers,
+  })

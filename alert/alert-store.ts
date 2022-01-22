@@ -13,7 +13,7 @@ export interface AlertState {
   display: Alert[]
 };
 
-export type AlertEventShow = PayloadStoreEvent<RawAlert>
+export type AlertEventShow = PayloadStoreEvent<'alert/showAlert', RawAlert>
 
 export type AlertEvent =
   | AlertEventShow
@@ -21,13 +21,6 @@ export type AlertEvent =
 const initialState: AlertState = {
   display: [],
 }
-
-export const alertSlice = (): CoreStoreSlice<AlertState, typeof reducers> =>
-  createCoreStoreSlice({
-    name: 'alert',
-    initialState,
-    reducers,
-  })
 
 const showAlert = (state: AlertState, event: AlertEventShow): AlertState => ({
   display: [
@@ -39,3 +32,10 @@ const showAlert = (state: AlertState, event: AlertEventShow): AlertState => ({
 const reducers = {
   showAlert,
 }
+
+export const alertSlice: CoreStoreSlice<AlertState, typeof reducers> =
+  createCoreStoreSlice({
+    name: 'alert',
+    initialState,
+    reducers,
+  })

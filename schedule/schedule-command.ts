@@ -2,6 +2,8 @@ import { scheduleSlice } from './schedule-store'
 import type { CoreCommand } from '@core/command'
 import type { AppStore } from '@app/app-store'
 
+const { eventCreators: { setSchedule } } = scheduleSlice
+
 interface ScheduleCommand extends CoreCommand {
   on: (arg: { interval: number }) => void
   off: () => void
@@ -11,7 +13,6 @@ interface ScheduleCommand extends CoreCommand {
 }
 
 export const scheduleCommand = (appStore: AppStore): ScheduleCommand => {
-  const { eventCreators: { setSchedule } } = scheduleSlice()
   return {
     on: ({ interval }: { interval: number }) => {
       appStore.send(setSchedule({ scheduleStatus: 'on', interval }))
@@ -23,10 +24,10 @@ export const scheduleCommand = (appStore: AppStore): ScheduleCommand => {
       appStore.send({ type: 'schedule/initialize' })
     },
     switchOn: ({ interval }: { interval: number }) => {
-      appStore.send({ type: 'schedule/switch-on', payload: { interval } })
+      appStore.send({ type: 'schedule/switchOn', payload: { interval } })
     },
     switchOff: () => {
-      appStore.send({ type: 'schedule/switch-off' })
+      appStore.send({ type: 'schedule/switchOff' })
     },
   }
 }

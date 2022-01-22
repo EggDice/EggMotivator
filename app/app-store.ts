@@ -22,7 +22,7 @@ export type AppStoreEvent =
 export type AppStore = CoreStore<AppStoreState, AppStoreEvent>
 
 export const appStore = (): AppStore => createCoreStore<AppStoreState, AppStoreEvent>({
-  schedule: scheduleSlice().reducer,
-  alert: alertSlice().reducer,
-  metric: metricSlice().reducer,
+  schedule: scheduleSlice.reducer,
+  alert: alertSlice.reducer,
+  metric: metricSlice.reducer,
 })

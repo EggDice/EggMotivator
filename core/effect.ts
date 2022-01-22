@@ -1,7 +1,14 @@
 import { filter } from 'rxjs/operators'
 
-import type { OperatorFunction } from 'rxjs'
+import type { OperatorFunction, Observable } from 'rxjs'
 import type { StoreEvent } from '@core/store'
+
+export type CoreEffectFunction<T extends StoreEvent> =
+ (event$: Observable<T>) => Observable<T>
+
+export interface CoreEffect<T extends StoreEvent> {
+  [key: string]: CoreEffectFunction<T>
+}
 
 export const filterByType = <
   ALL_EVENTS extends StoreEvent,
