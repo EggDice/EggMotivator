@@ -16,6 +16,7 @@ import { AlertEventShow } from '@alert/alert-store'
 import type {
   NotificationService,
 } from '@notification/notification'
+import { mergeMap, last } from 'rxjs/operators'
 
 test('init with no notifications scheduled', coreMarbles((m) => {
   const { effect } = createEffect()
@@ -70,6 +71,26 @@ test('switch on', coreMarbles((m) => {
   })
 }))
 
+test('switch on should create the notifications', coreMarbles((m) => {
+  const { effect, notificationService } = createEffect()
+  const event$ = m.cold('i|', {
+    i: EVENT_SWITCH_ON,
+  })
+  const notifications$ =
+    effect.handleSwitchOn(event$).pipe(
+      last(),
+      mergeMap(() => notificationService.getIntervalNotifications()),
+    )
+  m.expect(notifications$).toBeObservable('--(1|)', {
+    1: [{
+      title: 'Ping',
+      body: '5 minutes passed',
+      interval: 5 * 60 * 1000,
+      id: '0',
+    }],
+  })
+}))
+
 test('switch on error handling', coreMarbles((m) => {
   const error = new Error('Unable to schedule notifications')
   const { effect } = createEffect({
@@ -106,6 +127,26 @@ test('switch off error handling', coreMarbles((m) => {
   m.expect(effect.handleSwitchOff(event$)).toBeObservable('-(am)', {
     m: EVENT_METRIC_ERROR('ERROR_NOTIFICATIONS_UNABLE_TO_CLEAR', error),
     a: EVENT_ALERT('Could not turn off notifications'),
+  })
+}))
+
+test('switch off should clear the notifications', coreMarbles((m) => {
+  const { effect, notificationService } = createEffect()
+  notificationService.setIntervalNotification({
+    title: '',
+    body: '',
+    interval: 5 * 60 * 1000,
+  })
+  const event$ = m.cold('i|', {
+    i: EVENT_SWITCH_OFF,
+  })
+  const notifications$ =
+    effect.handleSwitchOff(event$).pipe(
+      last(),
+      mergeMap(() => notificationService.getIntervalNotifications()),
+    )
+  m.expect(notifications$).toBeObservable('--(0|)', {
+    0: [],
   })
 }))
 
