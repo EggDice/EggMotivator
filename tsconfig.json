@@ -9,7 +9,8 @@
       "@notification/*": ["notification/*"],
       "@schedule/*": ["schedule/*"],
       "@alert/*": ["alert/*"],
-      "@metric/*": ["metric/*"]
+      "@metric/*": ["metric/*"],
+      "@expo/*": ["expo/*"]
     }
   }
 }

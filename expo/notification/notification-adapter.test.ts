@@ -1,7 +1,7 @@
 import { notificationAdapter } from './notification-adapter'
 import { fakeExpoNotifications } from './fake-notifications-expo-external'
 import type { ExpoNotifications } from './notifications-expo-external'
-import type { NotificationService } from './notification'
+import type { NotificationService } from '@notification/notification'
 import type {
   ExpoNotificationsFakeConfigs,
 } from './fake-notifications-expo-external'

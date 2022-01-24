@@ -12,7 +12,7 @@ import type {
   NotificationService,
   IntervalNotificationSchedule,
   IntervalNotification,
-} from './notification'
+} from '@notification/notification'
 
 const MILISECONDS: number = 1000
 
