@@ -19,7 +19,7 @@ module.exports = function (api) {
             '@schedule': './schedule',
             '@alert': './alert',
             '@metric': './metric',
-            '@expo': './expo',
+            '@expo-app': './expo-app',
           },
         },
       ],

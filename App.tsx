@@ -18,7 +18,8 @@ const ExternalNotifications = {
 
 export default main({
   services: { ExternalNotifications },
-  run: ({ Root }) => {
+  run: ({ Root, schedule }) => {
+    schedule.initialize()
     return Root
   },
 })

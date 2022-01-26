@@ -1,7 +1,9 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
+    "esModuleInterop": true,
     "strict": true,
+    "jsx": "react",
     "baseUrl": ".",
     "paths": {
       "@core/*": ["core/*"],
@@ -10,7 +12,7 @@
       "@schedule/*": ["schedule/*"],
       "@alert/*": ["alert/*"],
       "@metric/*": ["metric/*"],
-      "@expo/*": ["expo/*"]
+      "@expo-app/*": ["expo-app/*"]
     }
   }
 }

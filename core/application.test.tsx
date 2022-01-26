@@ -1,3 +1,4 @@
+import React from 'react'
 import { application } from './application'
 
 import type { FunctionComponent } from 'react'

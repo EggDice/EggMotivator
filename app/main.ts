@@ -1,16 +1,24 @@
 import type {
   ExpoNotifications,
-} from '@expo/notification/notifications-expo-external'
+} from '@expo-app/notification/notifications-expo-external'
 import type { FunctionComponent } from 'react'
 import type { NotificationService } from '@notification/notification'
+import type { ScheduleFeature } from '@schedule/schedule-feature'
+import type { AppStore } from '@app/app-store'
 
 import { application } from '@core/application'
 import { getRoot } from './Root'
-import { notificationAdapter } from '@expo/notification/notification-adapter'
+import {
+  notificationAdapter,
+} from '@expo-app/notification/notification-adapter'
+import { createSchedule } from '@schedule/schedule-feature'
+import { appStore } from '@app/app-store'
 
 interface InternalServices {
   Root: FunctionComponent
-  notification: NotificationService
+  notificationService: NotificationService
+  schedule: ScheduleFeature
+  store: AppStore
 }
 interface ExternalServices { ExternalNotifications: ExpoNotifications }
 
@@ -24,8 +32,10 @@ export const main = ({
   externalServices: services,
   run,
   configure: ({ ExternalNotifications }) => {
-    const notification = notificationAdapter(ExternalNotifications)
-    const Root = getRoot({ notification })
-    return { Root, notification }
+    const notificationService = notificationAdapter(ExternalNotifications)
+    const store = appStore()
+    const schedule = createSchedule({ store, notificationService })
+    const Root = getRoot({ schedule })
+    return { Root, notificationService, schedule, store }
   },
 })
